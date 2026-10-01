@@ -29,6 +29,7 @@ white = '#e5dff1'
 [window]
 dimensions = { columns = 114, lines = 40 }
 
+# Shift+Enter sends ESC+Enter, which Claude Code reads as "insert newline" instead of "submit"
 [[keyboard.bindings]]
 key = "Return"
 mods = "Shift"
