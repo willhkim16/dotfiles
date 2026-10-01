@@ -1,8 +1,8 @@
 anthropic.claude-code
 azdavis.millet
-jeanp413.open-remote-ssh
 mads-hartmann.bash-ide-vscode
 ms-python.python
 ms-toolsai.jupyter
+ms-vscode-remote.remote-ssh
 ocamllabs.ocaml-platform
 tamasfe.even-better-toml

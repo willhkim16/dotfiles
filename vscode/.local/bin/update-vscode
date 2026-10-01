@@ -1,0 +1,40 @@
+#!/bin/bash
+# Update visual-studio-code-bin from the AUR; pacman -Syu doesn't cover it.
+# An AUR recipe runs on this machine, so show what changed in it before building.
+set -euo pipefail
+
+pkg=visual-studio-code-bin
+repo=${XDG_CACHE_HOME:-$HOME/.cache}/aur/$pkg
+
+if [[ ! -d $repo/.git ]]; then
+	git clone --quiet "https://aur.archlinux.org/$pkg.git" "$repo"
+	cd "$repo"
+	echo "First build from this clone: read the whole recipe."
+	cat PKGBUILD ./*.sh ./*.install
+	base=
+else
+	cd "$repo"
+	git fetch --quiet
+	base=HEAD
+fi
+
+installed=$(pacman -Q "$pkg" 2>/dev/null | cut -d' ' -f2 || true)
+available=$(git show '@{u}:PKGBUILD' | sed -n 's/^pkgver=//p;s/^pkgrel=//p' | paste -sd-)
+if [[ $installed == "$available" ]]; then
+	echo "$pkg $installed is up to date."
+	exit 0
+fi
+echo "$pkg: installed ${installed:-none}, available $available"
+
+if [[ -n $base ]] && ! git diff --quiet "$base" '@{u}'; then
+	git --no-pager log --format='%h %ad %an: %s' --date=short "$base..@{u}"
+	git --no-pager diff "$base" '@{u}'
+fi
+
+read -rp "Build and install $available? [y/N] " ok
+[[ $ok == [yY] ]] || exit 1
+
+git merge --ff-only --quiet '@{u}'
+makepkg -sic
+# Each version's .deb and package are ~400 MB together; nothing needs them after install
+rm -f ./*.deb ./*.pkg.tar.zst
