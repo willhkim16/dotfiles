@@ -16,14 +16,15 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 ## Install on a new machine
 
 ```sh
-sudo pacman -S git stow
+sudo pacman -S git stow git-delta                  # .gitconfig uses delta as its pager; git errors without it
 git clone git@github.com:willhkim16/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-stow -nv bash git ssh vim alacritty kwin vscode   # dry run: read what it would do
-stow -v  bash git ssh vim alacritty kwin vscode
+stow -nv --no-folding bash git ssh vim alacritty vscode   # dry run: read what it would do
+stow -v  --no-folding bash git ssh vim alacritty vscode
 mkdir -p ~/.ssh/sockets                            # used by the CIMS ControlPath
 xargs -n1 code --install-extension < extensions.txt
-kwin-rules                                         # apply window rules
+stow -v --no-folding kwin && kwin-rules            # only on a machine with the same monitors (rules are for DP-3)
 ```
 
+`--no-folding` makes Stow link individual files, never whole folders, so files other programs create (e.g. in `~/.local/bin`) don't land in the repo.
 Stow refuses to replace a real file that's already there. Move the existing file aside (or diff it against the repo copy), then stow again.
