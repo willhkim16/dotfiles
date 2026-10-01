@@ -4,9 +4,9 @@
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.mpl/bin:$PATH"
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+# Fallback for SSH/TTY logins, which skip ~/.config/environment.d. Keeps a forwarded agent if there is one.
+export SSH_AUTH_SOCK="${SSH_AUTH_SOCK:-$XDG_RUNTIME_DIR/ssh-agent.socket}"
 [[ -f ~/.bashrc ]] && . ~/.bashrc
-
 
 # BEGIN opam configuration
 # This is useful if you're using opam as it adds:

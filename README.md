@@ -5,9 +5,9 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 
 | Package | Configures |
 | --- | --- |
-| `bash` | prompt, `PATH`, ssh-agent socket |
+| `bash` | prompt, `PATH`, ssh-agent socket fallback for SSH/TTY logins |
 | `git` | identity, `delta` pager, `pull.rebase`, global ignores |
-| `ssh` | host nicknames, NYU CIMS gateway with connection reuse, agent key caching |
+| `ssh` | host nicknames, NYU CIMS gateway with connection reuse, agent key caching, `environment.d` file pointing the whole desktop session at the ssh-agent |
 | `vim` | line numbers, search, OCaml tooling via opam |
 | `alacritty` | terminal colors and keybindings |
 | `kwin` | `kwin-rules`, a script that declares KDE window rules (version the script, not KDE's generated `kwinrulesrc`) |
@@ -22,6 +22,7 @@ cd ~/dotfiles
 stow -nv --no-folding bash git ssh vim alacritty vscode   # dry run: read what it would do
 stow -v  --no-folding bash git ssh vim alacritty vscode
 mkdir -p ~/.ssh/sockets                            # used by the CIMS ControlPath
+systemctl --user enable --now ssh-agent.socket     # the agent environment.d points at; log out and back in once
 xargs -n1 code --install-extension < extensions.txt
 stow -v --no-folding kwin && kwin-rules            # only on a machine with the same monitors (rules are for DP-3)
 ```
