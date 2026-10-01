@@ -6,5 +6,6 @@
     "millet.format.engine": "smlfmt",
     "[sml]": {
         "editor.formatOnSave": true
-    }
+    },
+    "workbench.colorTheme": "Default High Contrast"
 }
