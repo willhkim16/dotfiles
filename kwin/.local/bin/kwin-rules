@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# Declares my KWin window rules and applies them.
+#
+# Usage: edit the RULES section at the bottom, then run `kwin-rules`.
+# Safe to re-run: each run sets the same keys to the same values.
+#
+# Rule keys reference (what the numbers mean):
+#   *match (wmclassmatch, titlematch):  0 = ignore, 1 = exact, 2 = substring, 3 = regex
+#   *rule  (positionrule, sizerule...): 2 = Force, 3 = Apply Initially, 4 = Remember# Coordinates are logical pixels (physical / scale). Check yours with: kscreen-doctor -o
+# Tip: to discover keys for a new property, set it once in System Settings >
+# Window Rules, then look at ~/.config/kwinrulesrc to see what it wrote.
+
+set -euo pipefail
+
+FILE=kwinrulesrc
+
+# rule NAME KEY=VALUE [KEY=VALUE ...]
+# Writes each KEY=VALUE into the [NAME] group and registers NAME in [General].
+rule() {
+    local name=$1; shift
+    local pair
+    for pair in "$@"; do
+        kwriteconfig6 --file "$FILE" --group "$name" --key "${pair%%=*}" "${pair#*=}"
+    done
+
+    # [General] rules= is a comma-separated list of active rule groups.
+    local rules
+    rules=$(kreadconfig6 --file "$FILE" --group General --key rules)
+    if [[ ",$rules," != *",$name,"* ]]; then
+        rules=${rules:+$rules,}$name
+        kwriteconfig6 --file "$FILE" --group General --key rules "$rules"
+    fi
+    local count
+    count=$(tr ',' '\n' <<<"$rules" | grep -c .)
+    kwriteconfig6 --file "$FILE" --group General --key count "$count"
+}
+
+# ---------------------------------------------------------------- RULES ----
+
+# Second monitor (DP-3) is portrait: 1600 physical px / 1.5 scale = 1066.667
+# logical px wide. Rules only take whole numbers, and width 1067 rounds up to
+# 1601 physical px, bleeding 1px onto the main monitor.
+# 44px panel at the bottom, so usable height is 2516 and half of it is 1258.
+
+# Discord: bottom half. Title regex skips the small "Discord Updater" splash.
+# Maximizing doesn't work here: Discord restores its own saved width
+# (WINDOW_BOUNDS in ~/.config/discord/settings.json) right after opening, even
+# over a Forced maximize. So round down to 1066 instead: a 1px wallpaper gap
+# on the right edge rather than a 1px bleed onto the main monitor.
+rule discord-bottom-half \
+    "Description=Discord: bottom half of second monitor (DP-3)" \
+    wmclass=discord        wmclassmatch=2 \
+    'title=^(?!Discord Updater$)' titlematch=3 \
+    position=0,1258        positionrule=3 \
+    size=1066,1258         sizerule=3
+
+# ---------------------------------------------------------------------------
+
+qdbus6 org.kde.KWin /KWin reconfigure
+echo "KWin rules applied."
