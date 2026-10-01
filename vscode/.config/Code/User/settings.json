@@ -7,5 +7,7 @@
     "[sml]": {
         "editor.formatOnSave": true
     },
-    "workbench.colorTheme": "Default High Contrast"
+    "terminal.integrated.initialHint": false,
+    "workbench.colorTheme": "Default High Contrast",
+    "git.openRepositoryInParentFolders": "always"
 }
