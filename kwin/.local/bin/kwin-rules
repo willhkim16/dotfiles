@@ -2,37 +2,38 @@
 # Declares my KWin window rules and applies them.
 #
 # Usage: edit the RULES section at the bottom, then run `kwin-rules`.
-# Safe to re-run: each run sets the same keys to the same values.
+# This script owns ~/.config/kwinrulesrc: each run rebuilds it from scratch, so
+# the rules below are exactly the rules KDE has. Deleting a rule here deletes
+# it in KDE, and rules made in System Settings are wiped on the next run.
 #
 # Rule keys reference (what the numbers mean):
 #   *match (wmclassmatch, titlematch):  0 = ignore, 1 = exact, 2 = substring, 3 = regex
-#   *rule  (positionrule, sizerule...): 2 = Force, 3 = Apply Initially, 4 = Remember# Coordinates are logical pixels (physical / scale). Check yours with: kscreen-doctor -o
+#   *rule  (positionrule, sizerule...): 2 = Force, 3 = Apply Initially, 4 = Remember
+# Coordinates are logical pixels (physical / scale). Check yours with: kscreen-doctor -o
 # Tip: to discover keys for a new property, set it once in System Settings >
 # Window Rules, then look at ~/.config/kwinrulesrc to see what it wrote.
 
 set -euo pipefail
 
-FILE=kwinrulesrc
+FILE=${XDG_CONFIG_HOME:-$HOME/.config}/kwinrulesrc
+
+# Build into a temp file next to the real one, then swap it in with one mv.
+# Same folder = same filesystem, so the mv is atomic: KWin never sees a
+# half-written file, and if anything fails the old rules stay untouched.
+TMP=$(mktemp "$FILE.XXXXXX")
+trap 'rm -f "$TMP"' EXIT
+
+NAMES=()
 
 # rule NAME KEY=VALUE [KEY=VALUE ...]
-# Writes each KEY=VALUE into the [NAME] group and registers NAME in [General].
+# Writes each KEY=VALUE into the [NAME] group.
 rule() {
     local name=$1; shift
     local pair
     for pair in "$@"; do
-        kwriteconfig6 --file "$FILE" --group "$name" --key "${pair%%=*}" "${pair#*=}"
+        kwriteconfig6 --file "$TMP" --group "$name" --key "${pair%%=*}" "${pair#*=}"
     done
-
-    # [General] rules= is a comma-separated list of active rule groups.
-    local rules
-    rules=$(kreadconfig6 --file "$FILE" --group General --key rules)
-    if [[ ",$rules," != *",$name,"* ]]; then
-        rules=${rules:+$rules,}$name
-        kwriteconfig6 --file "$FILE" --group General --key rules "$rules"
-    fi
-    local count
-    count=$(tr ',' '\n' <<<"$rules" | grep -c .)
-    kwriteconfig6 --file "$FILE" --group General --key count "$count"
+    NAMES+=("$name")
 }
 
 # ---------------------------------------------------------------- RULES ----
@@ -56,5 +57,10 @@ rule discord-bottom-half \
 
 # ---------------------------------------------------------------------------
 
+# [General] lists the active rule groups (comma-separated) and how many there are.
+kwriteconfig6 --file "$TMP" --group General --key rules "$(IFS=,; echo "${NAMES[*]}")"
+kwriteconfig6 --file "$TMP" --group General --key count "${#NAMES[@]}"
+
+mv "$TMP" "$FILE"
 qdbus6 org.kde.KWin /KWin reconfigure
-echo "KWin rules applied."
+echo "KWin rules applied (${#NAMES[@]})."

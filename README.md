@@ -10,7 +10,7 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 | `ssh` | host nicknames, NYU CIMS gateway with connection reuse, agent key caching, `environment.d` file pointing the whole desktop session at the ssh-agent |
 | `vim` | line numbers, search, OCaml tooling via opam |
 | `alacritty` | terminal colors and keybindings |
-| `kwin` | `kwin-rules`, a script that declares KDE window rules (version the script, not KDE's generated `kwinrulesrc`) |
+| `kwin` | `kwin-rules`, a script that rebuilds KDE's `kwinrulesrc` from the rules it declares, so the script is the single source of truth (rules made in System Settings get wiped) |
 | `vscode` | Code - OSS settings; `extensions.txt` lists extensions |
 
 ## Install on a new machine
