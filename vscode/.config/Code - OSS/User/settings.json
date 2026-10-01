@@ -2,13 +2,6 @@
     "security.workspace.trust.untrustedFiles": "open",
     "workbench.secondarySideBar.defaultVisibility": "hidden",
     "claudeCode.preferredLocation": "panel",
-    "github.copilot.enable": {
-        "*": false,
-        "plaintext": false,
-        "markdown": false,
-        "scminput": false,
-        "sml": false
-    },
     "millet.format.engine": "smlfmt",
     "[sml]": {
         "editor.formatOnSave": true

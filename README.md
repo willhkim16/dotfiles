@@ -11,7 +11,7 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 | `vim` | line numbers, search, OCaml tooling via opam |
 | `alacritty` | terminal colors and keybindings |
 | `kwin` | `kwin-rules`, a script that rebuilds KDE's `kwinrulesrc` from the rules it declares, so the script is the single source of truth (rules made in System Settings get wiped) |
-| `vscode` | Code - OSS settings; `extensions.txt` lists extensions |
+| `vscode` | Code - OSS settings; `extensions.txt` lists the extensions I chose (their extension-pack members install automatically) |
 
 ## Install on a new machine
 
