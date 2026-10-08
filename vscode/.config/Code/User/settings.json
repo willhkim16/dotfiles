@@ -8,6 +8,12 @@
         "editor.formatOnSave": true
     },
     "terminal.integrated.initialHint": false,
-    "workbench.colorTheme": "Default High Contrast",
-    "git.openRepositoryInParentFolders": "always"
+    "git.openRepositoryInParentFolders": "always",
+    "github.copilot.enable": {
+        "*": false,
+        "plaintext": false,
+        "markdown": false,
+        "scminput": false,
+        "python": false
+    }
 }
