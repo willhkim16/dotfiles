@@ -5,7 +5,8 @@
     "claudeCode.preferredLocation": "panel",
     "millet.format.engine": "smlfmt",
     "[sml]": {
-        "editor.formatOnSave": true
+        "editor.formatOnSave": true,
+        "editor.inlayHints.enabled": "offUnlessPressed"
     },
     "terminal.integrated.initialHint": false,
     "git.openRepositoryInParentFolders": "always",
