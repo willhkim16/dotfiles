@@ -88,14 +88,16 @@ jump() {
         echo "jump: '$1' points to $dir, which no longer exists (remove it: mark -d $1)" >&2
         return 1
     fi
-    cd "$dir"
+    cd "$dir" || return # return, not exit: exit would close the terminal
 }
 
 # Tab-complete bookmark names after `jump` and `mark -d`.
 # bash passes $1 = command, $2 = word being completed, $3 = the word before it.
 _bookmark_complete() {
     if [[ $1 == jump || $3 == -d ]]; then
-        COMPREPLY=($(compgen -W "$(awk '{ print $1 }' "$BOOKMARKS_FILE" 2>/dev/null)" -- "$2"))
+        # mapfile puts one match per array entry. COMPREPLY=($(...)) would also glob-expand
+        # them, so a bookmark named * would complete to the files in the current folder.
+        mapfile -t COMPREPLY < <(compgen -W "$(awk '{ print $1 }' "$BOOKMARKS_FILE" 2>/dev/null)" -- "$2")
     fi
 }
 complete -F _bookmark_complete jump mark
