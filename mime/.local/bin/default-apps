@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Declares which app opens which file types, and applies it.
+#
+# Usage: edit the lists below, then run `default-apps`.
+# Unlike kwin-rules, this doesn't own its file: it only sets the types listed
+# here in ~/.config/mimeapps.list and leaves every other association alone,
+# so machine-specific ones (and "Remember application association" in Dolphin)
+# survive. Running it again is harmless.
+#
+# Find a file's type with: xdg-mime query filetype FILE
+# Check what opens a type: xdg-mime query default TYPE
+
+set -euo pipefail
+
+VSCODE=com.microsoft.VSCode.desktop
+
+# Source code and config files. Markdown (Okular renders it) and HTML (browser)
+# are left out on purpose.
+CODE_TYPES=(
+    text/plain
+    text/x-python text/x-python3
+    text/x-csrc text/x-chdr text/x-c++src text/x-c++hdr
+    text/x-java text/x-kotlin text/x-scala text/x-csharp
+    text/javascript application/typescript text/css
+    text/x-go text/rust text/x-lua application/x-ruby application/x-php
+    text/x-haskell text/x-ocaml text/x-scheme text/x-common-lisp
+    text/x-shellscript text/x-makefile text/x-cmake text/x-dockerfile
+    application/json application/yaml application/x-yaml application/toml application/xml
+    application/sql text/x-patch
+)
+
+# xdg-mime's KDE branch calls qtpaths, which isn't installed here; it falls
+# back fine but prints an error per type, so silence stderr.
+xdg-mime default "$VSCODE" "${CODE_TYPES[@]}" 2>/dev/null
+
+# Verify instead of trusting the exit code.
+fail=0
+for t in "${CODE_TYPES[@]}"; do
+    got=$(xdg-mime query default "$t" 2>/dev/null)
+    if [[ $got != "$VSCODE" ]]; then
+        echo "default-apps: $t opens with '${got:-nothing}', not $VSCODE" >&2
+        fail=1
+    fi
+done
+(( fail == 0 )) && echo "default-apps: ${#CODE_TYPES[@]} types -> $VSCODE"
+exit "$fail"
