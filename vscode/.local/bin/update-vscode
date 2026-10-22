@@ -10,6 +10,9 @@ if [[ ! -d $repo/.git ]]; then
 	git clone --quiet "https://aur.archlinux.org/$pkg.git" "$repo"
 	cd "$repo"
 	echo "First build from this clone: read the whole recipe."
+	# nullglob: a pattern with no matches expands to nothing, not itself, so cat
+	# (and set -e) don't fail if the recipe stops shipping a .sh or .install file
+	shopt -s nullglob
 	cat PKGBUILD ./*.sh ./*.install
 	base=
 else
