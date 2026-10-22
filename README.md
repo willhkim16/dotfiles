@@ -7,7 +7,7 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 | --- | --- |
 | `bash` | prompt, `PATH`, ssh-agent socket fallback for SSH/TTY logins |
 | `git` | identity, `delta` pager, `pull.rebase`, global ignores |
-| `ssh` | host nicknames, NYU CIMS gateway with connection reuse, agent key caching, `environment.d` file pointing the whole desktop session at the ssh-agent |
+| `ssh` | host nicknames, NYU CIMS gateway with connection reuse (private hosts and my NetID go in an untracked `~/.ssh/config.local`, which the config includes), agent key caching, `environment.d` file pointing the whole desktop session at the ssh-agent |
 | `vim` | line numbers, search, OCaml tooling via opam |
 | `alacritty` | terminal colors and keybindings |
 | `fontconfig` | prefer Noto Color Emoji over the monochrome Noto Sans Symbols 2 for emoji in monospace, so emoji render in color in Alacritty |
@@ -25,6 +25,7 @@ cd ~/dotfiles
 stow -nv --no-folding bash git ssh vim alacritty fontconfig vscode claude   # dry run: read what it would do
 stow -v  --no-folding bash git ssh vim alacritty fontconfig vscode claude
 mkdir -p ~/.ssh/sockets                            # used by the CIMS ControlPath
+scp willkim@<PC-tailscale-IP>:.ssh/config.local ~/.ssh/   # private hosts (the willkim-arch alias lives in this file, so use the IP)
 systemctl --user enable --now ssh-agent.socket     # the agent environment.d points at; log out and back in once
 update-vscode                                      # first run clones the AUR recipe and prints it; read it before answering y
 xargs -n1 code --install-extension < extensions.txt
