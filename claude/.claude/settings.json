@@ -44,7 +44,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "notify-send 'Claude Code' 'Waiting for you'"
+            "command": "notify-send -i \"$(ls -d \"$HOME\"/.vscode/extensions/anthropic.claude-code-*/resources/claude-logo.png 2>/dev/null | sort -V | tail -n 1)\" 'Claude Code' 'Waiting for you'"
           }
         ]
       }
