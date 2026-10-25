@@ -13,7 +13,7 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 | `fontconfig` | prefer Noto Color Emoji over the monochrome Noto Sans Symbols 2 for emoji in monospace, so emoji render in color in Alacritty |
 | `mime` | `default-apps`, which sets VS Code as the default app for code and config file types (Python, C/C++, JSON, YAML, ...) and leaves every other association in `mimeapps.list` alone, since that file also holds machine-specific entries |
 | `kwin` | `kwin-rules`, a script that rebuilds KDE's `kwinrulesrc` from the rules it declares, so the script is the single source of truth (rules made in System Settings get wiped) |
-| `claude` | Claude Code settings: Opus at high effort, dark theme, plugins (`frontend-design`, `rust-analyzer-lsp`) |
+| `claude` | Claude Code settings: Opus at high effort, dark theme, plugins (`frontend-design`, `rust-analyzer-lsp`, `pyright-lsp`); and the global `CLAUDE.md` (tutoring by default, with per-project build mode, and commit message rules) |
 | `vscode` | VS Code settings (SML: format with `smlfmt` on save, Millet's inline type hints hidden unless Ctrl+Alt is held) and `update-vscode`, which builds the official VS Code (`visual-studio-code-bin`, needed for Remote-SSH) from its AUR recipe after showing what changed in it, since `pacman -Syu` doesn't update it; `extensions.txt` lists the extensions I chose (their extension-pack members install automatically) |
 
 ## Install on a new machine
