@@ -8,6 +8,9 @@
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 
+# Editor for programs that open one (sudoedit, crontab -e). Their fallback, vi, isn't installed.
+export EDITOR=vim
+
 # Colors (24-bit RGB)
 USERNAME_COLOR="\[\e[38;2;21;244;238m\]" # Sky Blue
 AT_COLOR="\[\e[38;2;255;255;0m\]" # Neon Yellow
