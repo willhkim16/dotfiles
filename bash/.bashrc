@@ -63,8 +63,8 @@ _bookmarks_help() {
 Directory bookmarks:
   mark [name]      bookmark the current directory (name defaults to the folder's name)
   mark -d <name>   delete a bookmark
+  mark -l          list all bookmarks (so does jump with no name)
   jump <name>      cd to a bookmark (Tab completes names)
-  jump [-l]        list all bookmarks
   -h, --help       show this help (on either command)
 HELP
     echo "Stored in $BOOKMARKS_FILE"
@@ -76,6 +76,10 @@ _bookmark_path() {
     awk -v n="$1" '$1 == n { sub(/^[^ ]+ /, ""); print; exit }' "$BOOKMARKS_FILE" 2>/dev/null
 }
 
+_bookmark_list() {
+    [[ -f $BOOKMARKS_FILE ]] && awk '{ n = $1; sub(/^[^ ]+ /, ""); printf "%-15s %s\n", n, $0 }' "$BOOKMARKS_FILE"
+}
+
 _bookmark_delete() {
     [[ -f $BOOKMARKS_FILE ]] || return
     awk -v n="$1" '$1 != n' "$BOOKMARKS_FILE" > "$BOOKMARKS_FILE.tmp" && mv "$BOOKMARKS_FILE.tmp" "$BOOKMARKS_FILE"
@@ -84,9 +88,10 @@ _bookmark_delete() {
 mark() {
     case $1 in
         -h|--help) _bookmarks_help; return ;;
+        -l|--list) _bookmark_list; return ;;
         -d)
             if [[ -z $2 || -z $(_bookmark_path "$2") ]]; then
-                echo "mark: no bookmark '$2' (list them: jump -l)" >&2
+                echo "mark: no bookmark '$2' (list them: mark -l)" >&2
                 return 1
             fi
             _bookmark_delete "$2"
@@ -108,15 +113,13 @@ mark() {
 jump() {
     case $1 in
         -h|--help) _bookmarks_help; return ;;
-        -l|'')
-            [[ -f $BOOKMARKS_FILE ]] && awk '{ n = $1; sub(/^[^ ]+ /, ""); printf "%-15s %s\n", n, $0 }' "$BOOKMARKS_FILE"
-            return ;;
+        '') _bookmark_list; return ;;
         -*) echo "jump: unknown option '$1' (see: jump -h)" >&2; return 1 ;;
     esac
     local dir
     dir=$(_bookmark_path "$1")
     if [[ -z $dir ]]; then
-        echo "jump: no bookmark '$1' (list them: jump -l)" >&2
+        echo "jump: no bookmark '$1' (list them: mark -l)" >&2
         return 1
     fi
     if [[ ! -d $dir ]]; then
