@@ -11,14 +11,46 @@ alias grep='grep --color=auto'
 # Editor for programs that open one (sudoedit, crontab -e). Their fallback, vi, isn't installed.
 export EDITOR=vim
 
-# Colors (24-bit RGB)
-USERNAME_COLOR="\[\e[38;2;21;244;238m\]" # Sky Blue
-AT_COLOR="\[\e[38;2;255;255;0m\]" # Neon Yellow
-HOST_COLOR="\[\e[38;2;255;0;169m\]" # Neon Pink
-RESET_COLOR="\[\e[0m\]"
+# Prompt, on two lines so a long path never shortens the space you type in:
+#   user@host ~/some/dir (main *=) exit 1
+#   $
+# The git part only shows inside a repo, and "exit N" only after a failed command.
 
-# Prompt. \\$ prints # as root, $ otherwise (a single \ would be eaten by the double quotes)
-PS1="[${USERNAME_COLOR}\u${AT_COLOR}@${HOST_COLOR}\h${RESET_COLOR} \w]\\$ "
+# Prompt colors: 24-bit RGB foreground escapes, \e[38;2;R;G;Bm. The \[ \] around each
+# one tell bash it takes no screen space; without them bash miscounts the prompt's
+# width and long command lines wrap wrong. Single quotes keep every backslash as is.
+_prompt_user='\[\e[38;2;21;244;238m\]' # sky blue
+_prompt_at='\[\e[38;2;255;255;0m\]'    # neon yellow
+_prompt_host='\[\e[38;2;255;0;169m\]'  # neon pink
+_prompt_path='\[\e[1m\]'               # bold
+_prompt_error='\[\e[38;2;255;85;85m\]' # red
+_prompt_reset='\[\e[0m\]'
+
+# __git_ps1 ships with git. Its options add symbols after the branch name:
+source /usr/share/git/completion/git-prompt.sh 2>/dev/null
+GIT_PS1_SHOWDIRTYSTATE=1     # * unstaged changes, + staged changes
+GIT_PS1_SHOWUNTRACKEDFILES=1 # % untracked files
+GIT_PS1_SHOWUPSTREAM=auto    # < behind, > ahead, <> diverged, = up to date with the remote
+GIT_PS1_SHOWCOLORHINTS=1     # branch turns green when clean, red when dirty
+
+# Rebuild PS1 before every prompt, since the git state and exit status change.
+_set_prompt() {
+    local status=$? # must come first: every command after this overwrites $?
+    local before="${_prompt_user}\u${_prompt_at}@${_prompt_host}\h${_prompt_reset} ${_prompt_path}\w${_prompt_reset}"
+    local after=''
+    ((status)) && after+=" ${_prompt_error}exit ${status}${_prompt_reset}"
+    after+='\n\$ ' # \$ prints # as root, $ otherwise
+    if declare -F __git_ps1 >/dev/null; then
+        __git_ps1 "$before" "$after" ' (%s)' # sets PS1 to before + branch info + after
+    else
+        PS1=$before$after
+    fi
+    return "$status" # pass $? on to the PROMPT_COMMAND entries that run after this one
+}
+# PROMPT_COMMAND is a list (/etc/bash.bashrc puts a window-title command in it), so add
+# to it rather than replacing it. _set_prompt goes first so it sees the command's real $?.
+# The check stops `source ~/.bashrc` from adding it twice.
+[[ " ${PROMPT_COMMAND[*]} " == *" _set_prompt "* ]] || PROMPT_COMMAND=(_set_prompt "${PROMPT_COMMAND[@]}")
 
 # Directory bookmarks: `mark [name]` saves the current directory, `jump <name>` cds
 # there. -h on either shows all options.
