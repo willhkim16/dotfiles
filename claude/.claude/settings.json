@@ -23,6 +23,19 @@
     "anthropic-skills:skill-creator": "off",
     "anthropic-skills:xlsx": "off"
   },
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "permission_prompt|elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notify-focus.sh"
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
@@ -36,18 +49,5 @@
   "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "theme": "dark",
-  "autoCompactEnabled": true,
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt|elicitation_dialog",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify-focus.sh"
-          }
-        ]
-      }
-    ]
-  }
+  "autoCompactEnabled": true
 }
