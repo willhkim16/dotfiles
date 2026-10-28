@@ -2,6 +2,7 @@
 
 set nocompatible                " in case this file is loaded with `vim -u`
 syntax on
+filetype plugin indent on       " per-language settings and indenting (e.g. wrap commit messages at 72)
 set shortmess+=I                " no startup splash
 set number relativenumber       " current line shows its number, others show distance (for 5j, 3k)
 set laststatus=2                " always show the status line

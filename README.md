@@ -8,7 +8,7 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 | `bash` | prompt, `PATH`, ssh-agent socket fallback for SSH/TTY logins |
 | `git` | identity, `delta` pager, `pull.rebase`, global ignores |
 | `ssh` | host nicknames, NYU CIMS gateway with connection reuse (private hosts and my NetID go in an untracked `~/.ssh/config.local`, which the config includes), agent key caching, `environment.d` file pointing the whole desktop session at the ssh-agent |
-| `vim` | line numbers, search, OCaml tooling via opam |
+| `vim` | line numbers, search, per-language plugins and indenting, OCaml tooling via opam |
 | `alacritty` | terminal colors and keybindings |
 | `fontconfig` | prefer Noto Color Emoji over the monochrome Noto Sans Symbols 2 for emoji in monospace, so emoji render in color in Alacritty |
 | `mime` | `default-apps`, which sets VS Code as the default app for code and config file types (Python, C/C++, JSON, YAML, ...) and leaves every other association in `mimeapps.list` alone, since that file also holds machine-specific entries |
