@@ -1,0 +1,7 @@
+#!/bin/bash
+# Mount by filesystem UUID, not /dev/sda2: device names follow plug-in order, so another USB
+# drive could take sda and get the whole system copied onto it. The UUID is the LIN_BACKUP partition.
+sudo mount UUID=81acbda9-2992-4ebc-8c10-f178b30536fa /mnt || { echo "mount failed: is the backup drive plugged in? Nothing copied."; exit 1; }
+mountpoint -q /mnt || { echo "/mnt is not a mounted drive. Nothing copied."; exit 1; }
+sudo rsync -aAXHv --exclude={"/dev/*","/proc/*","/sys/*","/tmp/*","/run/*","/mnt/*","/media/*","/lost+found"} / /mnt/
+sudo umount /mnt
