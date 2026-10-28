@@ -9,6 +9,7 @@
     },
     "terminal.integrated.initialHint": false,
     "git.openRepositoryInParentFolders": "always",
+    "git.autofetch": true,
     "github.copilot.enable": {
         "*": false,
         "plaintext": false,
