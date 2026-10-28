@@ -37,7 +37,23 @@ fi
 read -rp "Build and install $available? [y/N] " ok
 [[ $ok == [yY] ]] || exit 1
 
+# Take the password now, while someone is at the keyboard. Prompting after the
+# download and build means it can time out unanswered and waste the build.
+sudo -v
+
 git merge --ff-only --quiet '@{u}'
-makepkg -sic
-# Each version's .deb and package are ~400 MB together; nothing needs them after install
-rm -f ./*.deb ./*.pkg.tar.zst
+
+# Build and install separately rather than makepkg -i, so that if the install
+# fails (sudo timed out, pacman was locked...) rerunning the script picks up the
+# package it already built instead of downloading and packaging again.
+built=$(makepkg --packagelist)
+if [[ -f $built ]]; then
+	echo "Reusing the package built earlier: ${built##*/}"
+else
+	makepkg -sc
+fi
+sudo pacman -U "$built"
+
+# Each version's .deb and package are ~600 MB together; nothing needs them after
+# install. set -e skips this if the install failed, which keeps the package for reuse.
+rm -f ./*.deb "$built"
