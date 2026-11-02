@@ -4,12 +4,26 @@ set -euo pipefail
 in="$1"; target=${2:-19}; abr=96
 out="${in%.*}_discord.mp4"
 dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$in")
+trc=$(ffprobe -v error -select_streams v:0 -show_entries stream=color_transfer -of csv=p=0 "$in")
 vbr=$(echo "$target*8192/$dur - $abr" | bc)
 log="${in%.*}"
 quiet=(-hide_banner -loglevel error -stats)
+
+# Discord's player only decodes 8-bit H.264, so always end in yuv420p.
+# HDR sources (HLG from iPhones, PQ from most other cameras) get tone-mapped
+# to SDR first; a plain bit-depth cut would leave them grey and washed out.
+vf="scale=-2:720"
+case "$trc" in
+  arib-std-b67|smpte2084)
+    vf+=",zscale=t=linear:npl=100,format=gbrpf32le,zscale=p=bt709,tonemap=hable:desat=0,zscale=t=bt709:m=bt709:r=tv"
+    echo "HDR source ($trc): tone-mapping to SDR" ;;
+esac
+vf+=",format=yuv420p"
+
+enc=(-map 0:v:0 -map 0:a:0 -vf "$vf" -c:v libx264 -preset slow -b:v ${vbr}k -passlogfile "$log")
 echo "pass 1/2: ${dur%.*}s clip -> ${vbr}k video + ${abr}k audio"
-ffmpeg "${quiet[@]}" -y -i "$in" -vf scale=-2:720 -c:v libx264 -preset slow -b:v ${vbr}k -pass 1 -passlogfile "$log" -an -f null /dev/null
+ffmpeg "${quiet[@]}" -y -i "$in" "${enc[@]}" -pass 1 -an -f null /dev/null
 echo "pass 2/2"
-ffmpeg "${quiet[@]}" -i "$in" -vf scale=-2:720 -c:v libx264 -preset slow -b:v ${vbr}k -pass 2 -passlogfile "$log" -c:a aac -b:a ${abr}k "$out"
+ffmpeg "${quiet[@]}" -i "$in" "${enc[@]}" -pass 2 -c:a aac -b:a ${abr}k -movflags +faststart "$out"
 rm -f "$log"-0.log "$log"-0.log.mbtree
 echo "wrote $out ($(du -h "$out" | cut -f1))"
