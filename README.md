@@ -13,6 +13,7 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 | `fontconfig` | prefer Noto Color Emoji over the monochrome Noto Sans Symbols 2 for emoji in monospace, so emoji render in color in Alacritty |
 | `mime` | `default-apps`, which sets VS Code as the default app for code and config file types (Python, C/C++, JSON, YAML, ...) and leaves every other association in `mimeapps.list` alone, since that file also holds machine-specific entries |
 | `kwin` | `kwin-rules`, a script that rebuilds KDE's `kwinrulesrc` from the rules it declares, so the script is the single source of truth (rules made in System Settings get wiped) |
+| `discordify` | `discordify`, which two-pass encodes a clip to 720p H.264 at whatever video bitrate lands the file under a size target (default 19 MB, Discord's free-tier limit): `discordify clip.mp4 [target_MB]` writes `clip_discord.mp4` next to it |
 | `backup` | `backup`, which mounts the external backup drive by UUID and rsyncs the whole system onto it, stopping before any copy if the drive isn't there; PC only, since the UUID is that drive's |
 | `claude` | Claude Code settings: Opus at high effort, dark theme, plugins (`frontend-design`, `rust-analyzer-lsp`, `pyright-lsp`); and the global `CLAUDE.md` (tutoring by default, with per-project build mode, and commit message rules) |
 | `vscode` | VS Code settings (SML: format with `smlfmt` on save, Millet's inline type hints hidden unless Ctrl+Alt is held) and `update-vscode`, which builds the official VS Code (`visual-studio-code-bin`, needed for Remote-SSH) from its AUR recipe after showing what changed in it, since `pacman -Syu` doesn't update it; `extensions.txt` lists the extensions I chose (their extension-pack members install automatically) |
@@ -23,8 +24,8 @@ Each top-level folder is a Stow package that mirrors its path under `~`, so `sto
 sudo pacman -S git stow git-delta noto-fonts-emoji # .gitconfig uses delta as its pager; git errors without it. The fontconfig rule needs the emoji font
 git clone git@github.com:willhkim16/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-stow -nv --no-folding bash git ssh vim alacritty fontconfig vscode claude   # dry run: read what it would do
-stow -v  --no-folding bash git ssh vim alacritty fontconfig vscode claude
+stow -nv --no-folding bash git ssh vim alacritty fontconfig vscode claude discordify   # dry run: read what it would do
+stow -v  --no-folding bash git ssh vim alacritty fontconfig vscode claude discordify
 mkdir -p ~/.ssh/sockets                            # used by the CIMS ControlPath
 scp willkim@<PC-tailscale-IP>:.ssh/config.local ~/.ssh/   # private hosts (the willkim-arch alias lives in this file, so use the IP)
 systemctl --user enable --now ssh-agent.socket     # the agent environment.d points at; log out and back in once

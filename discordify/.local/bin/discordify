@@ -1,0 +1,10 @@
+#!/bin/bash
+# usage: discordify clip.mp4 [target_MB]
+set -euo pipefail
+in="$1"; target=${2:-19}; abr=96
+dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$in")
+vbr=$(echo "$target*8192/$dur - $abr" | bc)
+log="${in%.*}"
+ffmpeg -y -i "$in" -vf scale=-2:720 -c:v libx264 -preset slow -b:v ${vbr}k -pass 1 -passlogfile "$log" -an -f null /dev/null
+ffmpeg -i "$in" -vf scale=-2:720 -c:v libx264 -preset slow -b:v ${vbr}k -pass 2 -passlogfile "$log" -c:a aac -b:a ${abr}k "${in%.*}_discord.mp4"
+rm -f "$log"-0.log "$log"-0.log.mbtree
