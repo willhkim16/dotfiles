@@ -4,7 +4,7 @@ set -euo pipefail
 in="$1"; target=${2:-19}; abr=96
 out="${in%.*}_discord.mp4"
 dur=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$in")
-trc=$(ffprobe -v error -select_streams v:0 -show_entries stream=color_transfer -of csv=p=0 "$in")
+trc=$(ffprobe -v error -select_streams v:0 -show_entries stream=color_transfer -of default=nw=1:nk=1 "$in")
 vbr=$(echo "$target*8192/$dur - $abr" | bc)
 log="${in%.*}"
 quiet=(-hide_banner -loglevel error -stats)
