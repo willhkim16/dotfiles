@@ -50,5 +50,7 @@
   "promptSuggestionEnabled": false,
   "theme": "dark",
   "autoCompactEnabled": true,
-  "agentPushNotifEnabled": true
+  "agentPushNotifEnabled": true,
+  "feedbackDrafts": "off",
+  "cleanupPeriodDays": 36500
 }
