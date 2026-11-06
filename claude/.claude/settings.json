@@ -7,7 +7,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "fable",
   "skillOverrides": {
     "anthropic-skills:built-in-browser": "off",
     "anthropic-skills:chrome-browser": "off",
@@ -49,5 +49,6 @@
   "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "theme": "dark",
-  "autoCompactEnabled": true
+  "autoCompactEnabled": true,
+  "agentPushNotifEnabled": true
 }
